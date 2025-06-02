@@ -14,12 +14,12 @@ export default function Page() {
   const ITEMS_PER_PAGE = 10
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/transactions')
+    fetch('https://camrilla-admin-backend.onrender.com/api/transactions')
       .then((res) => res.json())
       .then((data) => setTransactions(data))
       .catch((err) => console.error('Transaction fetch error:', err))
 
-    fetch('http://localhost:4000/api/users')
+    fetch('https://camrilla-admin-backend.onrender.com/api/users')
       .then((res) => res.json())
       .then((data) => setUsers(data))
       .catch((err) => console.error('User fetch error:', err))
@@ -35,7 +35,7 @@ export default function Page() {
 
   const handleViewTransactions = async (email) => {
     try {
-      const res = await fetch(`http://localhost:4000/api/transactions?email=${email}`)
+      const res = await fetch(`https://camrilla-admin-backend.onrender.com/api/transactions?email=${email}`)
       const data = await res.json()
       setUserTransactions(data)
       setSelectedUser(email)

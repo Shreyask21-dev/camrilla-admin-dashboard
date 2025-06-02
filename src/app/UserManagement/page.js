@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export default function Page() {
   const [users, setUsers] = useState([]);
@@ -21,17 +23,44 @@ export default function Page() {
     fetchUsers();
     fetchStats();
   }, []);
+  const exportToExcel = () => {
+    const dataToExport = users.map((user) => ({
+      user_id: user.user_id,
+      name: user.name,
+      email: user.email,
+      mobile: user.mobile,
+      country: user.country,
+      current_plan: user.current_plan,
+      plan_status: user.plan_status,
+      plan_start_date: formatDate(user.plan_start_date),
+      plan_end_date: formatDate(user.plan_end_date),
+      validity: getValidityStatus(user.plan_end_date), // ✅ include computed column
+      total_assignment_count: user.total_assignment_count,
+      total_leads_count: user.total_leads_count,
+      payment_status: user.payment_status,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(data, "users.xlsx");
+  };
 
   const fetchUsers = () => {
     axios
-      .get("http://localhost:4000/api/user_details")
+      .get("https://camrilla-admin-backend.onrender.com/api/user_details")
       .then((res) => setUsers(res.data))
       .catch(() => toast.error("Failed to load user data"));
   };
 
   const fetchStats = () => {
     axios
-      .get("http://localhost:4000/api/user-stats")
+      .get("https://camrilla-admin-backend.onrender.com/api/user-stats")
       .then((res) => setStats(res.data))
       .catch(() => toast.error("Failed to load user stats"));
   };
@@ -79,7 +108,7 @@ export default function Page() {
   const handleDelete = async (userId) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`http://localhost:4000/api/delete_user/${userId}`);
+      await axios.delete(`https://camrilla-admin-backend.onrender.com/api/delete_user/${userId}`);
       toast.success("User deleted successfully");
       fetchUsers();
       fetchStats(); // update stats after deletion
@@ -92,7 +121,7 @@ export default function Page() {
     const newName = prompt("Enter new name:", user.name);
     if (!newName || newName === user.name) return;
     try {
-      await axios.put(`http://localhost:4000/api/update_user/${user.user_id}`, {
+      await axios.put(`https://camrilla-admin-backend.onrender.com/api/update_user/${user.user_id}`, {
         name: newName,
       });
       toast.success("User updated successfully");
@@ -101,6 +130,12 @@ export default function Page() {
     } catch {
       toast.error("Failed to update user");
     }
+  };
+  const getValidityStatus = (endDate) => {
+    if (!endDate) return "Expired";
+    const now = new Date();
+    const planEnd = new Date(endDate);
+    return planEnd >= now ? "Active" : "Expired";
   };
 
   return (
@@ -192,20 +227,8 @@ export default function Page() {
 
             {/* User Management Table (unchanged) */}
             <div className="card">
-              <h5 className="card-header d-flex justify-content-between align-items-center">
-                {/* <span>User Management</span> */}
-                <input
-                  type="text"
-                  placeholder="Search by name, email, or plan"
-                  className="form-control w-auto"
-                  style={{ maxWidth: "250px" }}
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                />
-              </h5>
+           <h5 className="card-header d-flex justify-content-between align-items-center"><input type="text" placeholder="Search by name, email, or plan" className="form-control w-auto" style={{ maxWidth: "250px" }} value={searchTerm} onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }} /><div className="d-flex justify-content-end px-4 pt-2"><button className="btn btn-outline-primary" onClick={exportToExcel}>Export to Excel</button></div></h5>
+
 
               <span className="small text-muted">
                 Page {currentPage} of {totalPages}
@@ -222,22 +245,27 @@ export default function Page() {
                         "mobile",
                         "country",
                         "current_plan",
+                        "plan_status",
                         "plan_start_date",
                         "plan_end_date",
+                        "Account_status", // ✅ new
                         "total_assignment_count",
                         "total_leads_count",
                         "payment_status",
                       ].map((key) => (
                         <th
                           key={key}
-                          onClick={() => handleSort(key)}
-                          style={{ cursor: "pointer" }}
+                          onClick={() => key !== "validity" && handleSort(key)}
+                          style={{
+                            cursor: key !== "validity" ? "pointer" : "default",
+                          }}
                         >
                           {key.replace(/_/g, " ").toUpperCase()}
                           {sortConfig.key === key &&
                             (sortConfig.direction === "asc" ? " ▲" : " ▼")}
                         </th>
                       ))}
+
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -250,8 +278,12 @@ export default function Page() {
                         <td>{user.mobile}</td>
                         <td>{user.country}</td>
                         <td>{user.current_plan || "—"}</td>
+                        <td>{user.plan_status || "INACTIVE"}</td>
+
                         <td>{formatDate(user.plan_start_date)}</td>
                         <td>{formatDate(user.plan_end_date)}</td>
+                        <td>{getValidityStatus(user.plan_end_date)}</td>
+
                         <td>{user.total_assignment_count}</td>
                         <td>{user.total_leads_count}</td>
                         <td>{user.payment_status || "—"}</td>

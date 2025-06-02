@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Dashboard from '../Dashboard/page'
+import Dashboard from "../Dashboard/page";
 // import config from '../config/config'
 
 export default function Page() {
@@ -20,23 +20,22 @@ export default function Page() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/admin/login",
+        "https://camrilla-admin-backend.onrender.com/api/admin/login",
         {
-          username,
+          email : username,
           password,
         }
       );
-      console.log(response.data)
-     if (response.data.token) {
-  localStorage.setItem('camrilla_token', response.data.token);
-  setSuccessMsg('Login Successful! Redirecting...');
-  setTimeout(() => {
-    router.push('/Dashboard');
-  }, 1000);
-} else {
-  alert('Login failed');
-}
-
+      console.log(response.data);
+      if (response.data.token) {
+        localStorage.setItem("camrilla_token", response.data.token);
+        setSuccessMsg("Login Successful! Redirecting...");
+        setTimeout(() => {
+          router.push("/Dashboard");
+        }, 1000);
+      } else {
+        alert("Login failed");
+      }
     } catch (error) {
       console.error("Login error:", error);
       alert("An error occurred while logging in.");

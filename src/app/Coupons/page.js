@@ -22,7 +22,7 @@ export default function CouponsDashboard() {
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [form, setForm] = useState({
     discount_coupon_code: '',
-    discount_coupon_type: 'percentage',
+    discount_coupon_type: 'PERCENTAGE',
     discount_value: '',
     start_date: '',
     end_date: '',
@@ -43,7 +43,7 @@ export default function CouponsDashboard() {
 
  const fetchStats = async () => {
   try {
-    const res = await axios.get('http://localhost:4000/api/coupons/stats');
+    const res = await axios.get('https://camrilla-admin-backend.onrender.com/api/coupons/stats');
     setStats(res.data);
   } catch (err) {
     console.error('Failed to fetch stats:', err);
@@ -53,7 +53,7 @@ export default function CouponsDashboard() {
 
 const fetchCoupons = async () => {
   try {
-    const res = await axios.get('http://localhost:4000/api/coupons');
+    const res = await axios.get('https://camrilla-admin-backend.onrender.com/api/coupons');
     setCoupons(res.data);
   } catch (err) {
     console.error('Failed to fetch coupons:', err);
@@ -85,7 +85,7 @@ const fetchCoupons = async () => {
       setEditingCoupon(null);
       setForm({
         discount_coupon_code: '',
-        discount_coupon_type: 'percentage',
+        discount_coupon_type: 'PERCENTAGE',
         discount_value: '',
         start_date: '',
         end_date: '',
@@ -111,10 +111,12 @@ const fetchCoupons = async () => {
     };
 
     if (editingCoupon) {
-      await axios.put(`http://localhost:4000/api/coupons/${editingCoupon.id}`, payload);
+      console.log(new Date(form.start_date).getTime());
+      
+      await axios.put(`https://camrilla-admin-backend.onrender.com/api/coupons/${editingCoupon.id}`, payload);
       toast.success('Coupon updated successfully!');
     } else {
-      await axios.post('http://localhost:4000/api/coupons', payload);
+      await axios.post('https://camrilla-admin-backend.onrender.com/api/coupons', payload);
       toast.success('Coupon added successfully!');
     }
 
@@ -131,7 +133,7 @@ const fetchCoupons = async () => {
   const deleteCoupon = async (id) => {
   if (!confirm('Are you sure you want to delete this coupon?')) return;
   try {
-    await axios.delete(`http://localhost:4000/api/coupons/${id}`);
+    await axios.delete(`https://camrilla-admin-backend.onrender.com/api/coupons/${id}`);
     toast.success('Coupon deleted successfully!');
     fetchCoupons();
     fetchStats();
@@ -193,7 +195,7 @@ const fetchCoupons = async () => {
                     <th>Start</th>
                     <th>End</th>
                     <th>Status</th>
-                    <th>Usage</th>
+                    <th>Usage Limit</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -201,7 +203,7 @@ const fetchCoupons = async () => {
                   {coupons.map((c, idx) => (
                     <tr key={idx}>
                       <td>{c.discount_coupon_code}</td>
-                      <td>{c.discount_coupon_type === 'flat' ? `$${c.discount_value}` : `${c.discount_value}%`}</td>
+                      <td>{c.discount_coupon_type === 'FLAT' ? `${c.discount_value}` : `${c.discount_value}%`}</td>
                       <td>{new Date(c.start_date).toLocaleDateString()}</td>
                       <td>{new Date(c.end_date).toLocaleDateString()}</td>
                       <td>
@@ -238,8 +240,8 @@ const fetchCoupons = async () => {
           <input name="discount_value" className="form-control mb-2" placeholder="Discount Value"
             value={form.discount_value} onChange={handleChange} />
           <select name="discount_coupon_type" className="form-control mb-2" value={form.discount_coupon_type} onChange={handleChange}>
-            <option value="percentage">Percentage</option>
-            <option value="flat">Flat</option>
+            <option value="PERCENTAGE">PERCENTAGE</option>
+            <option value="FLAT">FLAT</option>
           </select>
           <input name="start_date" type="date" className="form-control mb-2"
             value={form.start_date} onChange={handleChange} />

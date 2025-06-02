@@ -3,8 +3,12 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
+
+  const router = useRouter()
+
   return (
     <nav className="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
       <div className="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
@@ -103,7 +107,7 @@ export default function Navbar() {
               <li><div className="dropdown-divider"></div></li>
               <li><Link className="dropdown-item" href="#"><i className="ri-user-3-line ri-22px me-3"></i>My Profile</Link></li>
               <li><Link className="dropdown-item" href="#"><i className="ri-settings-4-line ri-22px me-3"></i>Settings</Link></li>
-              <li><div className="d-grid px-4 pt-2 pb-1"><a className="btn btn-sm btn-danger d-flex" href="#"><small className="align-middle">Logout</small></a></div></li>
+              <li><div className="d-grid px-4 pt-2 pb-1"><a className="btn btn-sm btn-danger d-flex" href="#"><small className="align-middle" onClick={()=>{localStorage.clear(); router.replace('/AdminLogin')}}>Logout</small></a></div></li>
             </ul>
           </li>
         </ul>

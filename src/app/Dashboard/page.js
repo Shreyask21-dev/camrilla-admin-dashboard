@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function page() {
+export default function Page() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [totalCoupons, setTotalCoupons] = useState(0);

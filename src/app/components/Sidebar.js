@@ -33,16 +33,16 @@ export default function Sidebar() {
       id="layout-menu"
       className="layout-menu menu-vertical menu bg-menu-theme"
     >
-      <div className="app-brand demo">
+      <div className="app-brand demo mt-2">
         <Link href="/" className="app-brand-link d-flex align-items-center">
           <span className="app-brand-logo demo d-flex align-items-center">
             {/* PNG Image in front of Camrilla */}
             <img
               src="/images/logo.png"
               alt="Camrilla Logo"
-              style={{ width: "30px", height: "30px", marginRight: "8px" }}
+              style={{ width: "50px", height: "50px", marginRight: "10px" }}
             />
-            <span className="app-brand-text demo menu-text fw-semibold">
+            <span className="app-brand-text demo menu-text fw-semibold fs-4">
               Camrilla
             </span>
           </span>
@@ -55,7 +55,8 @@ export default function Sidebar() {
             width="24"
             height="24"
             viewBox="0 0 24 24"
-            fill="none"
+            fill="currentColor"
+            className="text-black"
             xmlns="http://www.w3.org/2000/svg"
           >
             {/* SVG paths... */}
@@ -65,7 +66,7 @@ export default function Sidebar() {
 
       <div className="menu-inner-shadow"></div>
 
-      <ul className="menu-inner py-1">
+      <ul className="menu-inner py-1" style={{ marginTop: "15px" }}>
         {menuItems.map((item) => (
           <li
             key={item.href}

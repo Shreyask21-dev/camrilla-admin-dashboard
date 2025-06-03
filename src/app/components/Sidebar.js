@@ -7,7 +7,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const menuItems = [
-    { href: "/Dashboard", icon: "ri-mail-open-line", label: "Dashboards" },
+    { href: "/Dashboard", icon: "ri-mail-open-line", label: "Dashboard" },
     {
       href: "/UserManagement",
       icon: "ri-wechat-line",

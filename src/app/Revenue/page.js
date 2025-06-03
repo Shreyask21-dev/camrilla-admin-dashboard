@@ -87,66 +87,76 @@ export default function RevenuePage() {
 
     // Revenue Line Chart
     const fetchAndRenderLineChart = async () => {
-      const res = await fetch("https://camrilla-admin-backend.onrender.com/api/revenue/month-year");
-      const data = await res.json();
+  try {
+    const res = await fetch("https://camrilla-admin-backend.onrender.com/api/revenue/month-year");
+    const data = await res.json();
 
-      const sorted = data.sort((a, b) => new Date(a.month_year) - new Date(b.month_year));
-      const labels = sorted.map((item) => item.month_year);
-      const values = sorted.map((item) => item.total_revenue);
+    if (!Array.isArray(data)) {
+      console.error("Expected an array from API but got:", data);
+      return;
+    }
 
-      const options = {
-        chart: {
-          id: "revenueLineChart",
-          type: "line",
-          height: 400,
-          fontFamily: "Inter",
-          toolbar: { show: false },
-          animations: { enabled: true },
-        },
-        series: [{ name: "Revenue", data: values }],
-        xaxis: {
-          categories: labels,
-          title: { text: "Month-Year" },
-        },
-        stroke: {
-          curve: "smooth",
-          width: 3,
-          colors: ["#054a91"],
-        },
-        markers: {
-          size: 5,
-          colors: ["#054a91"],
-          strokeWidth: 2,
-          strokeColors: "#fff",
-          hover: { size: 7 },
-        },
-        fill: {
-          type: "gradient",
-          gradient: {
-            shade: "dark",
-            type: "vertical",
-            shadeIntensity: 0.4,
-            gradientToColors: ["#021f40"],
-            opacityFrom: 0.6,
-            opacityTo: 0.1,
-            stops: [0, 90, 100],
-          },
-        },
+    const sorted = data.sort((a, b) => new Date(a.month_year) - new Date(b.month_year));
+    const labels = sorted.map((item) => item.month_year);
+    const values = sorted.map((item) => item.total_revenue);
+
+    const options = {
+      chart: {
+        id: "revenueLineChart",
+        type: "line",
+        height: 400,
+        fontFamily: "Inter",
+        toolbar: { show: false },
+        animations: { enabled: true },
+      },
+      series: [{ name: "Revenue", data: values }],
+      xaxis: {
+        categories: labels,
+        title: { text: "Month-Year" },
+      },
+      stroke: {
+        curve: "smooth",
+        width: 3,
         colors: ["#054a91"],
-        tooltip: {
-          y: {
-            formatter: (val) => `₹${val.toLocaleString()}`,
-          },
+      },
+      markers: {
+        size: 5,
+        colors: ["#054a91"],
+        strokeWidth: 2,
+        strokeColors: "#fff",
+        hover: { size: 7 },
+      },
+      fill: {
+        type: "gradient",
+        gradient: {
+          shade: "dark",
+          type: "vertical",
+          shadeIntensity: 0.4,
+          gradientToColors: ["#021f40"],
+          opacityFrom: 0.6,
+          opacityTo: 0.1,
+          stops: [0, 90, 100],
         },
-      };
-
-      try {
-        await ApexCharts.exec("revenueLineChart", "destroy");
-      } catch {}
-
-      const chart = new ApexCharts(document.querySelector("#revenueLineChart"), options);
-      chart.render();
+      },
+      colors: ["#054a91"],
+      tooltip: {
+        y: {
+          formatter: (val) => `₹${val.toLocaleString()}`,
+        },
+      },
     };
+
+    try {
+      await ApexCharts.exec("revenueLineChart", "destroy");
+    } catch {}
+
+    const chart = new ApexCharts(document.querySelector("#revenueLineChart"), options);
+    chart.render();
+  } catch (err) {
+    console.error("Error fetching or rendering revenue line chart:", err);
+  }
+};
+
 
     fetchAndRenderLineChart();
 
@@ -233,14 +243,7 @@ export default function RevenuePage() {
           </div>
         </div>
 
-        <div className="col-12 mb-4">
-          <div className="card shadow-sm">
-            <div className="card-header">Engagement Breakdown (Radial)</div>
-            <div className="card-body">
-              <div id="radialChart"></div>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </div>
   );

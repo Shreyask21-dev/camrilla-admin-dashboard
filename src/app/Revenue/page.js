@@ -1,6 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
-import ApexCharts from "apexcharts";
+import React, { useEffect, useState } from "react";
 
 const countryMeta = {
   IN: { name: "India", symbol: "₹" },
@@ -12,7 +11,17 @@ const countryMeta = {
 };
 
 export default function RevenuePage() {
+  const [ApexCharts, setApexCharts] = useState(null);
+
   useEffect(() => {
+    import("apexcharts").then((mod) => {
+      setApexCharts(() => mod.default);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!ApexCharts) return;
+
     // Donut Chart
     const donutChart = new ApexCharts(document.querySelector("#donutChart"), {
       chart: { height: 390, type: "donut", fontFamily: "Inter" },
@@ -76,91 +85,72 @@ export default function RevenuePage() {
     });
     radialChart.render();
 
-    // Revenue Line Chart (Monthly)
- const fetchAndRenderLineChart = async () => {
-  const res = await fetch("https://camrilla-admin-backend.onrender.com/api/revenue/month-year");
-  const data = await res.json();
+    // Revenue Line Chart
+    const fetchAndRenderLineChart = async () => {
+      const res = await fetch("https://camrilla-admin-backend.onrender.com/api/revenue/month-year");
+      const data = await res.json();
 
-  // Sort by month_year ascending (e.g. "2024-02")
-  const sorted = data.sort((a, b) => new Date(a.month_year) - new Date(b.month_year));
-  const labels = sorted.map((item) => item.month_year);
-  const values = sorted.map((item) => item.total_revenue);
-   const yearChangeIndexes = [];
-  let lastYear = sorted[0]?.year;
-  sorted.forEach((item, idx) => {
-    if (item.year !== lastYear) {
-      yearChangeIndexes.push(idx - 0.5); // position between ticks
-      lastYear = item.year;
-    }
-  });
-  const options = {
-    chart: {
-      id: "revenueLineChart",
-      type: "line",
-      height: 400,
-      fontFamily: "Inter",
-      toolbar: { show: false },
-      animations:{enabled:true}
-    },
-    series: [
-      {
-        name: "Revenue",
-        data: values,
-      },
-    ],
-    xaxis: {
-      categories: labels,
-      title: {
-        text: "Month-Year",
-      },
-    },
-    stroke: {
-      curve: "smooth",
-      width: 3,
-      colors: ["#054a91"],
-    },
-    markers: {
-      size: 5,
-      colors: ["#054a91"],
-      strokeWidth: 2,
-      strokeColors: "#fff",
-      hover: {
-        size: 7,
-      },
-    },
-    fill: {
-      type: "gradient",
-      gradient: {
-        shade: "dark",
-        type: "vertical",
-        shadeIntensity: 0.4,
-        gradientToColors: ["#021f40"], 
-        opacityFrom: 0.6,
-        opacityTo: 0.1,
-        stops: [0, 90, 100],
-      },
-    },
-   colors: ["#054a91"],
-    tooltip: {
-      y: {
-        formatter: (val) => `₹${val.toLocaleString()}`,
-      },
-    },
-  };
+      const sorted = data.sort((a, b) => new Date(a.month_year) - new Date(b.month_year));
+      const labels = sorted.map((item) => item.month_year);
+      const values = sorted.map((item) => item.total_revenue);
 
-  // Destroy existing chart instance if exists to avoid duplicates
-  try {
-    await ApexCharts.exec("revenueLineChart", "destroy");
-  } catch {}
+      const options = {
+        chart: {
+          id: "revenueLineChart",
+          type: "line",
+          height: 400,
+          fontFamily: "Inter",
+          toolbar: { show: false },
+          animations: { enabled: true },
+        },
+        series: [{ name: "Revenue", data: values }],
+        xaxis: {
+          categories: labels,
+          title: { text: "Month-Year" },
+        },
+        stroke: {
+          curve: "smooth",
+          width: 3,
+          colors: ["#054a91"],
+        },
+        markers: {
+          size: 5,
+          colors: ["#054a91"],
+          strokeWidth: 2,
+          strokeColors: "#fff",
+          hover: { size: 7 },
+        },
+        fill: {
+          type: "gradient",
+          gradient: {
+            shade: "dark",
+            type: "vertical",
+            shadeIntensity: 0.4,
+            gradientToColors: ["#021f40"],
+            opacityFrom: 0.6,
+            opacityTo: 0.1,
+            stops: [0, 90, 100],
+          },
+        },
+        colors: ["#054a91"],
+        tooltip: {
+          y: {
+            formatter: (val) => `₹${val.toLocaleString()}`,
+          },
+        },
+      };
 
-  const chart = new ApexCharts(document.querySelector("#revenueLineChart"), options);
-  chart.render();
-};
+      try {
+        await ApexCharts.exec("revenueLineChart", "destroy");
+      } catch {}
 
-fetchAndRenderLineChart();
+      const chart = new ApexCharts(document.querySelector("#revenueLineChart"), options);
+      chart.render();
+    };
 
+    fetchAndRenderLineChart();
 
-    // Revenue by Country Bar
+    // Country Bar Chart
     fetch("https://camrilla-admin-backend.onrender.com/api/revenue/country")
       .then((res) => res.json())
       .then((data) => {
@@ -194,7 +184,6 @@ fetchAndRenderLineChart();
         countryBarChart.render();
       });
 
-    // Cleanup
     return () => {
       ApexCharts.exec("donutChart", "destroy");
       ApexCharts.exec("barChart", "destroy");
@@ -202,13 +191,12 @@ fetchAndRenderLineChart();
       ApexCharts.exec("revenueLineChart", "destroy");
       ApexCharts.exec("countryBarChart", "destroy");
     };
-  }, []);
+  }, [ApexCharts]);
 
   return (
     <div className="container py-5">
       <h2 className="mb-4 text-center">Revenue Overview</h2>
       <div className="row">
-        {/* Revenue by Country (Bar) */}
         <div className="col-12 mb-4">
           <div className="card shadow-sm">
             <div className="card-header">Revenue by Country (Bar)</div>
@@ -218,7 +206,6 @@ fetchAndRenderLineChart();
           </div>
         </div>
 
-        {/* Donut Chart */}
         <div className="col-md-6 mb-4">
           <div className="card shadow-sm">
             <div className="card-header">Revenue by Country (Donut)</div>
@@ -228,7 +215,6 @@ fetchAndRenderLineChart();
           </div>
         </div>
 
-        {/* Bar Chart */}
         <div className="col-md-6 mb-4">
           <div className="card shadow-sm">
             <div className="card-header">Monthly vs Yearly (Bar)</div>
@@ -238,14 +224,20 @@ fetchAndRenderLineChart();
           </div>
         </div>
 
-       
-
-        {/* New Line Chart for Revenue (Monthly) */}
         <div className="col-12 mb-4">
           <div className="card shadow-sm">
             <div className="card-header">Monthly Revenue Trend (Line)</div>
             <div className="card-body">
               <div id="revenueLineChart"></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12 mb-4">
+          <div className="card shadow-sm">
+            <div className="card-header">Engagement Breakdown (Radial)</div>
+            <div className="card-body">
+              <div id="radialChart"></div>
             </div>
           </div>
         </div>

@@ -38,7 +38,7 @@ export default function Sidebar() {
           <span className="app-brand-logo demo d-flex align-items-center">
             {/* PNG Image in front of Camrilla */}
             <img
-              src="../../../public/images/logo.png"
+              src="/images/logo.png"
               alt="Camrilla Logo"
               style={{ width: "30px", height: "30px", marginRight: "8px" }}
             />

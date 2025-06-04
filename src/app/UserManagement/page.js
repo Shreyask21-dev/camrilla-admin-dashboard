@@ -156,9 +156,9 @@ export default function Page() {
                     </div>
                     <h4 className="mb-0">{stats.total_users}</h4>
                   </div>
-                  <h6 className="mb-0 fw-normal">Total Users</h6>
+                  <h6 className="mb-0 fw-bold">Total Users</h6>
                   <p className="mb-0">
-                    <span className="me-1 fw-medium">+18.2%</span>
+                  
                     {/* <!-- <small className="text-muted">than last week</small> --> */}
                   </p>
                 </div>
@@ -176,10 +176,9 @@ export default function Page() {
                     </div>
                     <h4 className="mb-0">{stats.professional_users}</h4>
                   </div>
-                  <h6 className="mb-0 fw-normal">Professional Users</h6>
+                  <h6 className="mb-0 fw-bold">Professional Users</h6>
                   <p className="mb-0">
-                    <span className="me-1 fw-medium">-8.7%</span>
-                    <small className="text-muted">than last week</small>
+                    
                   </p>
                 </div>
               </div>
@@ -196,10 +195,9 @@ export default function Page() {
                     </div>
                     <h4 className="mb-0">{stats.active_users}</h4>
                   </div>
-                  <h6 className="mb-0 fw-normal">Active Users</h6>
+                  <h6 className="mb-0 fw-bold">Active Users</h6>
                   <p className="mb-0">
-                    <span className="me-1 fw-medium">+4.3%</span>
-                    <small className="text-muted">than last week</small>
+                   
                   </p>
                 </div>
               </div>
@@ -216,10 +214,9 @@ export default function Page() {
                     </div>
                     <h4 className="mb-0">{stats.basic_users}</h4>
                   </div>
-                  <h6 className="mb-0 fw-normal">Basic Users</h6>
+                  <h6 className="mb-0 fw-bold">Basic Users</h6>
                   <p className="mb-0">
-                    <span className="me-1 fw-medium">-2.5%</span>
-                    <small className="text-muted">than last week</small>
+                   
                   </p>
                 </div>
               </div>

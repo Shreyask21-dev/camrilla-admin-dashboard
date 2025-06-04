@@ -2,6 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Chart, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale } from "chart.js";
+
+Chart.register(LineController, LineElement, PointElement, LinearScale, Title, CategoryScale);
+
 
 export default function Page() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -12,6 +16,18 @@ export default function Page() {
   const [totalProfit, setTotalProfit] = useState(0); // Sum of
   const [assignmentCount, setAssignmentCount] = useState(0);
   const [leadCount, setLeadCount] = useState(0);
+  const [userStats, setUserStats] = useState({
+    total_users: 0,
+    professional_users: 0,
+    basic_users: 0,
+    active_users: 0,
+  });
+  useEffect(() => {
+    axios
+      .get("https://camrilla-admin-backend.onrender.com/api/user-stats")
+      .then((res) => setUserStats(res.data))
+      .catch((err) => console.error("Failed to load user stats:", err));
+  }, []);
 
   useEffect(() => {
     fetch("https://camrilla-admin-backend.onrender.com/api/stats-count")
@@ -90,6 +106,51 @@ export default function Page() {
       })
       .catch((err) => console.error(err));
   }, []);
+  useEffect(() => {
+  let chartInstance = null;
+  const ctx = document.getElementById("lineChart");
+
+  if (ctx) {
+    // Destroy previous chart if exists
+    if (Chart.getChart("lineChart")) {
+      Chart.getChart("lineChart").destroy();
+    }
+
+    chartInstance = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        datasets: [
+          {
+            label: "User Registrations",
+            data: [120, 150, 180, 200, 160, 220],
+            borderColor: "#7367F0",
+            backgroundColor: "rgba(115, 103, 240, 0.2)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  }
+
+  // Cleanup chart on unmount
+  return () => {
+    if (chartInstance) {
+      chartInstance.destroy();
+    }
+  };
+}, []);
+
 
   return (
     <div>
@@ -104,38 +165,12 @@ export default function Page() {
                 <div className="card-header">
                   <div className="d-flex justify-content-between">
                     <h5 className="mb-1">Revenue</h5>
-                    <div className="dropdown">
-                      <button
-                        className="btn btn-text-secondary rounded-pill text-muted border-0 p-1"
-                        type="button"
-                        id="salesOverview"
-                        data-bs-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                      >
-                        <i className="ri-more-2-line ri-20px"></i>
-                      </button>
-                      <div
-                        className="dropdown-menu dropdown-menu-end"
-                        aria-labelledby="salesOverview"
-                      >
-                        <a className="dropdown-item" href="javascript:void(0);">
-                          Refresh
-                        </a>
-                        <a className="dropdown-item" href="javascript:void(0);">
-                          Share
-                        </a>
-                        <a className="dropdown-item" href="javascript:void(0);">
-                          Update
-                        </a>
-                      </div>
-                    </div>
+                  
                   </div>
                   <div className="d-flex align-items-center card-subtitle">
-                    <div className="me-2">Total 425k Revenue</div>
+                    <div className="me-2"></div>
                     <div className="d-flex align-items-center text-success">
-                      <p className="mb-0 fw-medium">+18%</p>
-                      <i className="ri-arrow-up-s-line ri-20px"></i>
+                      <p className="mb-0 fw-medium"></p>
                     </div>
                   </div>
                 </div>
@@ -191,14 +226,9 @@ export default function Page() {
                     <div className="card-body">
                       <div className="card-info mb-5">
                         <h6 className="mb-2 text-nowrap">Total Assignments</h6>
-                        <div className="badge bg-label-primary rounded-pill lh-xs">
-                          Year of 2021
-                        </div>
                       </div>
                       <div className="d-flex align-items-center">
                         <h4 className="mb-0 me-2">{assignmentCount}</h4>
-                        <p className="mb-0 text-success">+15.6%</p>{" "}
-                        {/* Keep this static or calculate dynamically if needed */}
                       </div>
                     </div>
                   </div>
@@ -223,14 +253,9 @@ export default function Page() {
                     <div className="card-body">
                       <div className="card-info mb-5">
                         <h6 className="mb-2 text-nowrap">Total Leads</h6>
-                        <div className="badge bg-label-success rounded-pill lh-xs">
-                          Year of 2021
-                        </div>
                       </div>
                       <div className="d-flex align-items-center">
                         <h4 className="mb-0 me-2">{leadCount}</h4>
-                        <p className="mb-0 text-danger">-25.5%</p>{" "}
-                        {/* Keep static or dynamic */}
                       </div>
                     </div>
                   </div>
@@ -288,39 +313,10 @@ export default function Page() {
                 <div className="card-header">
                   <div className="d-flex justify-content-between">
                     <h5 className="mb-1">Users</h5>
-                    <div className="dropdown">
-                      <button
-                        className="btn btn-text-secondary rounded-pill text-muted border-0 p-1"
-                        type="button"
-                        id="salesOverview"
-                        data-bs-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                      >
-                        <i className="ri-more-2-line ri-20px"></i>
-                      </button>
-                      <div
-                        className="dropdown-menu dropdown-menu-end"
-                        aria-labelledby="salesOverview"
-                      >
-                        <a className="dropdown-item" href="javascript:void(0);">
-                          Refresh
-                        </a>
-                        <a className="dropdown-item" href="javascript:void(0);">
-                          Share
-                        </a>
-                        <a className="dropdown-item" href="javascript:void(0);">
-                          Update
-                        </a>
-                      </div>
-                    </div>
+                    
                   </div>
                   <div className="d-flex align-items-center card-subtitle">
-                    <div className="me-2">Total 48056 users</div>
-                    <div className="d-flex align-items-center text-success">
-                      <p className="mb-0 fw-medium">+18%</p>
-                      <i className="ri-arrow-up-s-line ri-20px"></i>
-                    </div>
+                    <div className="d-flex align-items-center text-success"></div>
                   </div>
                 </div>
                 <div className="card-body d-flex justify-content-between flex-wrap gap-4">
@@ -331,7 +327,7 @@ export default function Page() {
                       </div>
                     </div>
                     <div className="card-info">
-                      <h5 className="mb-0">8,458</h5>
+                      <h5 className="mb-0">{userStats.active_users}</h5>
                       <p className="mb-0">Active Users</p>
                     </div>
                   </div>
@@ -342,7 +338,7 @@ export default function Page() {
                       </div>
                     </div>
                     <div className="card-info">
-                      <h5 className="mb-0">2800</h5>
+                      <h5 className="mb-0">{userStats.professional_users}</h5>
                       <p className="mb-0">Professional Users</p>
                     </div>
                   </div>
@@ -353,8 +349,8 @@ export default function Page() {
                       </div>
                     </div>
                     <div className="card-info">
-                      <h5 className="mb-0">23</h5>
-                      <p className="mb-0">No of Countries</p>
+                      <h5 className="mb-0">{userStats.basic_users}</h5>
+                      <p className="mb-0">Basic Users</p>
                     </div>
                   </div>
                 </div>
@@ -368,7 +364,6 @@ export default function Page() {
                   <div className="d-flex justify-content-between flex-wrap gap-2">
                     <p className="d-block mb-0 text-body">Total Visits</p>
                     <div className="d-flex align-items-center text-success">
-                      <p className="mb-0">+18.4%</p>
                       <i className="ri-arrow-up-s-line ri-20px"></i>
                     </div>
                   </div>
@@ -476,8 +471,8 @@ export default function Page() {
             {/* <!--/ Total Visits --> */}
 
             {/* <!-- Sales This Months --> */}
-            <div className="col-6 col-sm-6">
-              <div className="card">
+            <div className="col-12 col-lg-6">
+              <div className="card h-100">
                 <div className="card-header d-flex justify-content-between">
                   <div>
                     <h5 className="card-title mb-0">New User Registration</h5>
@@ -494,7 +489,8 @@ export default function Page() {
                   </div>
                 </div>
                 <div className="card-body">
-                  <div id="lineChart"></div>
+                 <canvas id="lineChart" height="300"></canvas>
+
                 </div>
               </div>
             </div>
@@ -550,7 +546,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="col-xl-12 col-12 ">
+          {/* <div className="col-xl-12 col-12 ">
             <div className="card">
               <div className="card-header header-elements">
                 <h5 className="card-title mb-0">Yearly Revenue</h5>
@@ -564,10 +560,10 @@ export default function Page() {
                 ></canvas>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
-        <footer className="content-footer footer bg-footer-theme">
+        {/* <footer className="content-footer footer bg-footer-theme">
           <div className="container-xxl">
             <div className="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
               <div className="text-body mb-2 mb-md-0">
@@ -619,7 +615,7 @@ export default function Page() {
               </div>
             </div>
           </div>
-        </footer>
+        </footer> */}
         {/* <!-- / Footer --> */}
 
         <div className="content-backdrop fade"></div>

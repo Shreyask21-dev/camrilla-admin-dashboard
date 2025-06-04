@@ -573,10 +573,10 @@ function StatCard({ icon, label, count, color, trend }) {
             </div>
             <h4 className="mb-0">{count}</h4>
           </div>
-          <h6 className="mb-0 fw-normal">{label}</h6>
+          <h6 className="mb-0 fw-bold">{label}</h6>
           <p className="mb-0">
-            <span className="me-1 fw-medium">{trend}</span>
-            <small className="text-muted">than last week</small>
+            {/* <span className="me-1 fw-medium">{trend}</span> */}
+            {/* <small className="text-muted">than last week</small> */}
           </p>
         </div>
       </div>

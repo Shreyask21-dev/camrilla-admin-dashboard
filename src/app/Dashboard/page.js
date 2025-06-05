@@ -323,7 +323,7 @@ export default function Page() {
                   <div className="d-flex align-items-center gap-3">
                     <div className="avatar">
                       <div className="avatar-initial bg-label-primary rounded">
-                        <i className="ri-user-star-line ri-24px"></i>
+                        <i className="ri-user-line ri-24px"></i>
                       </div>
                     </div>
                     <div className="card-info">
@@ -334,7 +334,7 @@ export default function Page() {
                   <div className="d-flex align-items-center gap-3">
                     <div className="avatar">
                       <div className="avatar-initial bg-label-warning rounded">
-                        <i className="ri-pie-chart-2-line ri-24px"></i>
+                        <i className="ri-briefcase-line ri-24px"></i>
                       </div>
                     </div>
                     <div className="card-info">
@@ -345,7 +345,7 @@ export default function Page() {
                   <div className="d-flex align-items-center gap-3">
                     <div className="avatar">
                       <div className="avatar-initial bg-label-info rounded">
-                        <i className="ri-arrow-left-right-line ri-24px"></i>
+                        <i className="ri-user-smile-line ri-24px"></i>
                       </div>
                     </div>
                     <div className="card-info">

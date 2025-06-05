@@ -41,7 +41,9 @@ export default function PlansPage() {
 
   const fetchPlans = async () => {
     try {
-      const res = await axios.get("https://camrilla-admin-backend.onrender.com/api/plan");
+      const res = await axios.get(
+        "https://camrilla-admin-backend.onrender.com/api/plan"
+      );
       setPlans(res.data);
     } catch (err) {
       toast.error("Error fetching plans");
@@ -83,7 +85,9 @@ export default function PlansPage() {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await axios.get("https://camrilla-admin-backend.onrender.com/api/dashboard-stats");
+      const res = await axios.get(
+        "https://camrilla-admin-backend.onrender.com/api/dashboard-stats"
+      );
       setAnalytics(res.data);
     } catch (err) {
       toast.error("Error fetching analytics");
@@ -184,59 +188,62 @@ export default function PlansPage() {
       <div className="container-xxl flex-grow-1 container-p-y">
         <div className="row g-4">
           <StatCard
-            icon="ri-car-line"
+            icon="ri-earth-line" // 🌍 for country
             label="Country Total"
             count={analytics.total_country_count || 0}
             color="primary"
             trend="+18.2%"
           />
+
           <StatCard
-            icon="ri-alert-line"
+            icon="ri-file-list-line" // 📄 for plans
             label="Total Plans"
             count={analytics.total_plans || 0}
             color="warning"
             trend="-8.7%"
           />
+
           <StatCard
-            icon="ri-route-line"
-            label="Most Used Plan"
-            count={analytics.most_used_plan?.user_count || 0}
-            color="danger"
-            trend="+4.3%"
+            icon="ri-user-line"
+            label="Basic Plans"
+            count={analytics.basic_plan_count || 0}
+            color="success"
+            trend="+5%"
           />
+
           <StatCard
-            icon="ri-time-line"
-            label={analytics.most_used_plan?.plan_name || "N/A"}
-            count=""
-            color="info"
-            trend="-2.5%"
+            icon="ri-briefcase-line"
+            label="Professional Plans"
+            count={analytics.professional_plan_count || 0}
+            color="secondary"
+            trend="+3%"
           />
         </div>
 
         <div className="card mt-4">
           <div className="pb-4 rounded-top">
-            <div className="container py-4 d-flex justify-content-between">
+            <div className="container py-4 d-flex justify-content-between align-items-center">
               <input
                 type="text"
-                className="form-control w-50"
+                className="form-control form-control-sm w-50"
                 placeholder="Search by plan name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ height: "32px" }}
               />
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "10px",
-                }}
-              >
+              <div className="d-flex gap-2">
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-sm btn-primary"
                   onClick={() => setModalVisible(true)}
+                  style={{ height: "32px" }}
                 >
                   Add Plan
                 </button>
-                <button onClick={handleExportExcel} className="btn btn-primary">
+                <button
+                  onClick={handleExportExcel}
+                  className="btn btn-sm btn-primary"
+                  style={{ height: "32px" }}
+                >
                   Export Excel
                 </button>
               </div>
@@ -244,7 +251,7 @@ export default function PlansPage() {
 
             <h4 className="text-center mb-2">Plans Management</h4>
             <div className="table-responsive text-nowrap">
-              <table className="table table-striped">
+              <table className="table ">
                 <thead>
                   <tr>
                     {[
@@ -272,8 +279,14 @@ export default function PlansPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentPlans.map((plan) => (
-                    <tr key={plan.plan_id}>
+                  {currentPlans.map((plan, index) => (
+                    <tr
+                      key={plan.plan_id}
+                      style={{
+                        backgroundColor:
+                          index % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                      }}
+                    >
                       <td>{plan.plan_id}</td>
                       <td>{plan.country}</td>
                       <td>{plan.currency}</td>
@@ -287,12 +300,11 @@ export default function PlansPage() {
                           {(Array.isArray(plan.feature)
                             ? plan.feature
                             : JSON.parse(plan.feature || "[]")
-                          ).map((feat, index) => (
-                            <li key={index}>{feat}</li>
+                          ).map((feat, i) => (
+                            <li key={i}>{feat}</li>
                           ))}
                         </ul>
                       </td>
-
                       <td>
                         <button
                           className="btn btn-outline-primary btn-sm me-1"
@@ -311,7 +323,7 @@ export default function PlansPage() {
                   ))}
                   {currentPlans.length === 0 && (
                     <tr>
-                      <td colSpan="8" className="text-center">
+                      <td colSpan="10" className="text-center">
                         No plans found.
                       </td>
                     </tr>

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 
 export default function Page() {
+  const [data, setData] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [users, setUsers] = useState([]);
   const [userTransactions, setUserTransactions] = useState([]);
@@ -25,13 +26,37 @@ export default function Page() {
   useEffect(() => {
     fetch("https://camrilla-admin-backend.onrender.com/api/transactions")
       .then((res) => res.json())
-      .then((data) => setTransactions(data))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setTransactions(data);
+        } else if (Array.isArray(data.transactions)) {
+          setTransactions(data.transactions); // in case it's { transactions: [...] }
+        } else {
+          console.error("Unexpected data format for transactions:", data);
+          setTransactions([]); // fallback to empty array
+        }
+      })
       .catch((err) => console.error("Transaction fetch error:", err));
+  }, []);
 
-    fetch("https://camrilla-admin-backend.onrender.com/api/users-with-transactions")
+  useEffect(() => {
+    fetch(
+      "https://camrilla-admin-backend.onrender.com/api/users-with-transactions"
+    )
       .then((res) => res.json())
-      .then((data) => setUsers(data))
-      .catch((err) => console.error("User fetch error:", err));
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setUsers(data);
+        } else if (Array.isArray(data.users)) {
+          setUsers(data.users);
+        } else {
+          setUsers([]);
+        }
+      })
+      .catch((err) => {
+        console.error("User fetch error:", err);
+        setUsers([]);
+      });
   }, []);
 
   const paginate = (data, page) => {
@@ -124,22 +149,28 @@ export default function Page() {
       <div className="container-xxl flex-grow-1 container-p-y">
         {/* Transaction History */}
         <div className="card mb-5">
-          <div className="card-header d-flex justify-content-between flex-wrap gap-2 align-items-center">
+          <div className="card-header d-flex justify-content-between align-items-center flex-wrap">
             <h5 className="mb-0">Transaction History</h5>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search by name/email/mobile"
-              style={{ maxWidth: 300 }}
-              value={transactionSearch}
-              onChange={(e) => setTransactionSearch(e.target.value)}
-            />
-            <button
-              className="btn btn-sm btn-primary"
-              onClick={() => exportExcel(transactions, "all_transactions.xlsx")}
-            >
-              Export Excel
-            </button>
+
+            <div className="d-flex align-items-center gap-2 ms-auto">
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                placeholder="Search..."
+                style={{ width: 180, height: "32px" }}
+                value={transactionSearch}
+                onChange={(e) => setTransactionSearch(e.target.value)}
+              />
+              <button
+                className="btn btn-sm btn-primary"
+                style={{ height: "32px" }}
+                onClick={() =>
+                  exportExcel(transactions, "all_transactions.xlsx")
+                }
+              >
+                Export to excel
+              </button>
+            </div>
           </div>
 
           <div className="table-responsive text-nowrap">
@@ -181,34 +212,40 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody className="table-border-bottom-0">
-               {paginate(sortedTransactions, transactionPage).map((txn, index) => (
-  <tr
-    key={`${txn.transaction_id}-${txn.reference_id}`}
-    style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#ffffff" }}
-  >
-    <td>{txn.transaction_id}</td>
-    <td>{txn.user_name}</td>
-    <td>{txn.email}</td>
-    <td>{txn.currency || "INR"} {txn.amount}</td>
-    <td>{new Date(txn.date).toLocaleDateString()}</td>
-    <td>{txn.payment_method}</td>
-    <td>
-      <span
-        className={`badge rounded-pill ${
-          txn.status?.toLowerCase() === "success"
-            ? "bg-label-success"
-            : txn.status?.toLowerCase() === "initiated"
-            ? "bg-label-warning"
-            : "bg-label-danger"
-        }`}
-      >
-        {txn.status || "Unknown"}
-      </span>
-    </td>
-    <td>{txn.reference_id}</td>
-  </tr>
-))}
-
+                {paginate(sortedTransactions, transactionPage).map(
+                  (txn, index) => (
+                    <tr
+                      key={`${txn.transaction_id}-${txn.reference_id}`}
+                      style={{
+                        backgroundColor:
+                          index % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                      }}
+                    >
+                      <td>{txn.transaction_id}</td>
+                      <td>{txn.user_name}</td>
+                      <td>{txn.email}</td>
+                      <td>
+                        {txn.currency || "INR"} {txn.amount}
+                      </td>
+                      <td>{new Date(txn.date).toLocaleDateString()}</td>
+                      <td>{txn.payment_method}</td>
+                      <td>
+                        <span
+                          className={`badge rounded-pill ${
+                            txn.status?.toLowerCase() === "success"
+                              ? "bg-label-success"
+                              : txn.status?.toLowerCase() === "initiated"
+                              ? "bg-label-warning"
+                              : "bg-label-danger"
+                          }`}
+                        >
+                          {txn.status || "Unknown"}
+                        </span>
+                      </td>
+                      <td>{txn.reference_id}</td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>
@@ -241,7 +278,7 @@ export default function Page() {
             <h5 className="mb-0">User List with Transaction History</h5>
             <input
               type="text"
-              className="form-control"
+              className="form-control form-control-sm"
               placeholder="Search by name/email/mobile"
               style={{ maxWidth: 300 }}
               value={userSearch}
@@ -250,7 +287,7 @@ export default function Page() {
           </div>
 
           <div className="table-responsive text-nowrap">
-            <table className="table table-striped">
+            <table className="table ">
               <thead>
                 <tr>
                   {["name", "email", "mobile"].map((col) => (
@@ -280,27 +317,28 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody className="table-border-bottom-0">
-               {paginate(sortedUsers, userPage).map((user, index) => (
-  <tr
-    key={`${user.user_id}-${user.email}`}
-    style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#ffffff" }}
-  >
-    <td>{user.name}</td>
-    <td>{user.email}</td>
-    <td>{user.mobile}</td>
-    <td>
-      <button
-        className="btn btn-outline-primary"
-        onClick={() =>
-          handleViewTransactions(user.user_id, user.name)
-        }
-      >
-        View
-      </button>
-    </td>
-  </tr>
-))}
-
+                {paginate(sortedUsers, userPage).map((user, index) => (
+                  <tr
+                    key={`${user.user_id}-${user.email}`}
+                    style={{
+                      backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                    }}
+                  >
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.mobile}</td>
+                    <td>
+                      <button
+                        className="btn btn-outline-primary"
+                        onClick={() =>
+                          handleViewTransactions(user.user_id, user.name)
+                        }
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -384,7 +422,7 @@ export default function Page() {
 
                     return (
                       <>
-                        <div className="table-responsive">
+                        <div className="table-responsive text-nowrap">
                           <table className="table table-bordered">
                             <thead>
                               <tr>
@@ -422,9 +460,13 @@ export default function Page() {
                               </tr>
                             </thead>
                             <tbody>
-                              {paginate(sortedTxns, userTxnPage).map((txn) => (
+                              {paginate(sortedTxns, userTxnPage).map((txn,index) => (
                                 <tr
                                   key={`${txn.transaction_id}-${txn.reference_id}`}
+                                  style={{
+                                    backgroundColor:
+                                      index % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                                  }}
                                 >
                                   <td>{txn.transaction_id}</td>
                                   <td>₹{txn.amount}</td>

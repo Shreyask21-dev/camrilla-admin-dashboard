@@ -108,7 +108,9 @@ export default function Page() {
   const handleDelete = async (userId) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`https://camrilla-admin-backend.onrender.com/api/delete_user/${userId}`);
+      await axios.delete(
+        `https://camrilla-admin-backend.onrender.com/api/delete_user/${userId}`
+      );
       toast.success("User deleted successfully");
       fetchUsers();
       fetchStats(); // update stats after deletion
@@ -121,9 +123,12 @@ export default function Page() {
     const newName = prompt("Enter new name:", user.name);
     if (!newName || newName === user.name) return;
     try {
-      await axios.put(`https://camrilla-admin-backend.onrender.com/api/update_user/${user.user_id}`, {
-        name: newName,
-      });
+      await axios.put(
+        `https://camrilla-admin-backend.onrender.com/api/update_user/${user.user_id}`,
+        {
+          name: newName,
+        }
+      );
       toast.success("User updated successfully");
       fetchUsers();
       fetchStats(); // update stats after edit if necessary
@@ -158,7 +163,6 @@ export default function Page() {
                   </div>
                   <h6 className="mb-0 fw-bold">Total Users</h6>
                   <p className="mb-0">
-                  
                     {/* <!-- <small className="text-muted">than last week</small> --> */}
                   </p>
                 </div>
@@ -177,9 +181,7 @@ export default function Page() {
                     <h4 className="mb-0">{stats.professional_users}</h4>
                   </div>
                   <h6 className="mb-0 fw-bold">Professional Users</h6>
-                  <p className="mb-0">
-                    
-                  </p>
+                  <p className="mb-0"></p>
                 </div>
               </div>
             </div>
@@ -196,9 +198,7 @@ export default function Page() {
                     <h4 className="mb-0">{stats.active_users}</h4>
                   </div>
                   <h6 className="mb-0 fw-bold">Active Users</h6>
-                  <p className="mb-0">
-                   
-                  </p>
+                  <p className="mb-0"></p>
                 </div>
               </div>
             </div>
@@ -215,17 +215,34 @@ export default function Page() {
                     <h4 className="mb-0">{stats.basic_users}</h4>
                   </div>
                   <h6 className="mb-0 fw-bold">Basic Users</h6>
-                  <p className="mb-0">
-                   
-                  </p>
+                  <p className="mb-0"></p>
                 </div>
               </div>
             </div>
 
             {/* User Management Table (unchanged) */}
             <div className="card">
-           <h5 className="card-header d-flex justify-content-between align-items-center"><input type="text" placeholder="Search by name, email, or plan" className="form-control w-auto" style={{ maxWidth: "250px" }} value={searchTerm} onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }} /><div className="d-flex justify-content-end px-4 pt-2"><button className="btn btn-outline-primary" onClick={exportToExcel}>Export to Excel</button></div></h5>
-
+              <h5 className="card-header d-flex justify-content-between align-items-center">
+                <input
+                  type="text"
+                  placeholder="Search by name, email, or plan"
+                  className="form-control w-auto"
+                  style={{ maxWidth: "250px" }}
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+                <div className="d-flex justify-content-end px-4 pt-2">
+                  <button
+                    className="btn btn-primary"
+                    onClick={exportToExcel}
+                  >
+                    Export to Excel
+                  </button>
+                </div>
+              </h5>
 
               <span className="small text-muted">
                 Page {currentPage} of {totalPages}
@@ -268,7 +285,13 @@ export default function Page() {
                   </thead>
                   <tbody className="table-border-bottom-0">
                     {currentUsers.map((user, index) => (
-                      <tr key={index}>
+                      <tr
+                        key={user.user_id}
+                        style={{
+                          backgroundColor:
+                            index % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                        }}
+                      >
                         <td>{user.user_id}</td>
                         <td>{user.name}</td>
                         <td>{user.email}</td>
@@ -276,11 +299,9 @@ export default function Page() {
                         <td>{user.country}</td>
                         <td>{user.current_plan || "—"}</td>
                         <td>{user.plan_status || "INACTIVE"}</td>
-
                         <td>{formatDate(user.plan_start_date)}</td>
                         <td>{formatDate(user.plan_end_date)}</td>
                         <td>{getValidityStatus(user.plan_end_date)}</td>
-
                         <td>{user.total_assignment_count}</td>
                         <td>{user.total_leads_count}</td>
                         <td>{user.payment_status || "—"}</td>

@@ -199,7 +199,7 @@ export default function CouponsDashboard() {
                     },
                     {
                       label: "Discount Benefits",
-                      value: `$${stats.total_discount_benefits}`,
+                      value: ``,
                       icon: "ri-wallet-line",
                     },
                     {

@@ -22,6 +22,103 @@ export default function Page() {
   const [userSearch, setUserSearch] = useState("");
 
   const ITEMS_PER_PAGE = 10;
+  const currencyMap = {
+  IN: "₹",     // India
+  US: "$",     // United States
+  LK: "Rs.",   // Sri Lanka
+  GB: "£",     // United Kingdom
+  EU: "€",     // European Union
+  AU: "A$",    // Australia
+  CA: "C$",    // Canada
+  AE: "د.إ",   // UAE
+  SG: "S$",    // Singapore
+  NZ: "NZ$",   // New Zealand
+  MY: "RM",    // Malaysia
+  MA: "MAD",   // Morocco
+  ZA: "R",     // South Africa
+  BD: "৳",     // Bangladesh
+  NP: "Rs.",   // Nepal
+  PK: "₨",     // Pakistan
+  KW: "KD",    // Kuwait
+  SA: "ر.س",   // Saudi Arabia
+  QA: "﷼",     // Qatar
+  BH: "BD",    // Bahrain
+  OM: "﷼",     // Oman
+  TH: "฿",     // Thailand
+  PH: "₱",     // Philippines
+  NG: "₦",     // Nigeria
+  KE: "KSh",   // Kenya
+  GH: "₵",     // Ghana
+  UG: "USh",   // Uganda
+  ZW: "Z$",    // Zimbabwe
+  JP: "¥",     // Japan
+  CN: "¥",     // China
+  HK: "HK$",   // Hong Kong
+  KR: "₩",     // South Korea
+  RU: "₽",     // Russia
+  BR: "R$",    // Brazil
+  MX: "$",     // Mexico
+  AR: "$",     // Argentina
+  TR: "₺",     // Turkey
+  EG: "£",     // Egypt
+  IL: "₪",     // Israel
+  CH: "CHF",   // Switzerland
+  SE: "kr",    // Sweden
+  NO: "kr",    // Norway
+  DK: "kr",    // Denmark
+  SY: "SYP",   // Syria
+  SS: "SSP",   // South Sudan
+  HT: "G",     // Haiti
+};
+  const countryNames = {
+  IN: "India",
+  US: "United States",
+  LK: "Sri Lanka",
+  GB: "United Kingdom",
+  EU: "European Union",
+  AU: "Australia",
+  CA: "Canada",
+  AE: "United Arab Emirates",
+  SG: "Singapore",
+  NZ: "New Zealand",
+  MY: "Malaysia",
+  MA: "Morocco",
+  ZA: "South Africa",
+  BD: "Bangladesh",
+  NP: "Nepal",
+  PK: "Pakistan",
+  KW: "Kuwait",
+  SA: "Saudi Arabia",
+  QA: "Qatar",
+  BH: "Bahrain",
+  OM: "Oman",
+  TH: "Thailand",
+  PH: "Philippines",
+  NG: "Nigeria",
+  KE: "Kenya",
+  GH: "Ghana",
+  UG: "Uganda",
+  ZW: "Zimbabwe",
+  JP: "Japan",
+  CN: "China",
+  HK: "Hong Kong",
+  KR: "South Korea",
+  RU: "Russia",
+  BR: "Brazil",
+  MX: "Mexico",
+  AR: "Argentina",
+  TR: "Turkey",
+  EG: "Egypt",
+  IL: "Israel",
+  CH: "Switzerland",
+  SE: "Sweden",
+  NO: "Norway",
+  DK: "Denmark",
+  SY: "Syria",
+  SS: "South Sudan",
+  HT: "Haiti"
+};
+
 
   useEffect(() => {
     fetch("https://camrilla-admin-backend.onrender.com/api/transactions")
@@ -181,6 +278,7 @@ export default function Page() {
                     "transaction_id",
                     "user_name",
                     "email",
+                    "country",
                     "amount",
                     "payment_date",
                     "payment_method",
@@ -224,9 +322,12 @@ export default function Page() {
                       <td>{txn.transaction_id}</td>
                       <td>{txn.user_name}</td>
                       <td>{txn.email}</td>
+                        <td>{countryNames[txn.country_code] || txn.country_code}</td>
                       <td>
-                        {txn.currency || "INR"} {txn.amount}
+                        {currencyMap[txn.country_code] || txn.country_code}{" "}
+                        {txn.amount}
                       </td>
+
                       <td>{new Date(txn.date).toLocaleDateString()}</td>
                       <td>{txn.payment_method}</td>
                       <td>
@@ -460,41 +561,43 @@ export default function Page() {
                               </tr>
                             </thead>
                             <tbody>
-                              {paginate(sortedTxns, userTxnPage).map((txn,index) => (
-                                <tr
-                                  key={`${txn.transaction_id}-${txn.reference_id}`}
-                                  style={{
-                                    backgroundColor:
-                                      index % 2 === 0 ? "#f9f9f9" : "#ffffff",
-                                  }}
-                                >
-                                  <td>{txn.transaction_id}</td>
-                                  <td>₹{txn.amount}</td>
-                                  <td>
-                                    {new Date(
-                                      txn.payment_date
-                                    ).toLocaleString()}
-                                  </td>
-                                  <td>{txn.payment_method}</td>
-                                  <td>
-                                    <span
-                                      className={`badge rounded-pill ${
-                                        txn.payment_status?.toLowerCase() ===
-                                        "success"
-                                          ? "bg-label-success"
-                                          : txn.payment_status?.toLowerCase() ===
-                                            "initiated"
-                                          ? "bg-label-warning"
-                                          : "bg-label-danger"
-                                      }`}
-                                    >
-                                      {txn.payment_status || "Unknown"}
-                                    </span>
-                                  </td>
-                                  <td>{txn.plan_name || "-"}</td>
-                                  <td>{txn.reference_id || "-"}</td>
-                                </tr>
-                              ))}
+                              {paginate(sortedTxns, userTxnPage).map(
+                                (txn, index) => (
+                                  <tr
+                                    key={`${txn.transaction_id}-${txn.reference_id}`}
+                                    style={{
+                                      backgroundColor:
+                                        index % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                                    }}
+                                  >
+                                    <td>{txn.transaction_id}</td>
+                                    <td>₹{txn.amount}</td>
+                                    <td>
+                                      {new Date(
+                                        txn.payment_date
+                                      ).toLocaleString()}
+                                    </td>
+                                    <td>{txn.payment_method}</td>
+                                    <td>
+                                      <span
+                                        className={`badge rounded-pill ${
+                                          txn.payment_status?.toLowerCase() ===
+                                          "success"
+                                            ? "bg-label-success"
+                                            : txn.payment_status?.toLowerCase() ===
+                                              "initiated"
+                                            ? "bg-label-warning"
+                                            : "bg-label-danger"
+                                        }`}
+                                      >
+                                        {txn.payment_status || "Unknown"}
+                                      </span>
+                                    </td>
+                                    <td>{txn.plan_name || "-"}</td>
+                                    <td>{txn.reference_id || "-"}</td>
+                                  </tr>
+                                )
+                              )}
                             </tbody>
                           </table>
                         </div>

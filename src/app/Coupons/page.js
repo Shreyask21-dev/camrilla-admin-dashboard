@@ -76,7 +76,9 @@ export default function CouponsDashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get("https://camrilla-admin-backend.onrender.com/api/coupons/stats");
+      const res = await axios.get(
+        "https://camrilla-admin-backend.onrender.com/api/coupons/stats"
+      );
       setStats(res.data);
     } catch (err) {
       console.error("Failed to fetch stats:", err);
@@ -86,7 +88,9 @@ export default function CouponsDashboard() {
 
   const fetchCoupons = async () => {
     try {
-      const res = await axios.get("https://camrilla-admin-backend.onrender.com/api/coupons");
+      const res = await axios.get(
+        "https://camrilla-admin-backend.onrender.com/api/coupons"
+      );
       setCoupons(res.data);
     } catch (err) {
       console.error("Failed to fetch coupons:", err);
@@ -151,7 +155,10 @@ export default function CouponsDashboard() {
         );
         toast.success("Coupon updated successfully!");
       } else {
-        await axios.post("https://camrilla-admin-backend.onrender.com/api/coupons", payload);
+        await axios.post(
+          "https://camrilla-admin-backend.onrender.com/api/coupons",
+          payload
+        );
         toast.success("Coupon added successfully!");
       }
 
@@ -167,7 +174,9 @@ export default function CouponsDashboard() {
   const deleteCoupon = async (id) => {
     if (!confirm("Are you sure you want to delete this coupon?")) return;
     try {
-      await axios.delete(`https://camrilla-admin-backend.onrender.com/api/coupons/${id}`);
+      await axios.delete(
+        `https://camrilla-admin-backend.onrender.com/api/coupons/${id}`
+      );
       toast.success("Coupon deleted successfully!");
       fetchCoupons();
       fetchStats();
@@ -255,14 +264,14 @@ export default function CouponsDashboard() {
             </div>
 
             <div className="table-responsive text-nowrap">
-              <table className="table table-striped">
+              <table className="table">
                 <thead>
                   <tr>
                     {[
                       { key: "discount_coupon_code", label: "Coupon Code" },
                       { key: "discount_value", label: "Discount" },
-                      { key: "start_date", label: "Start" },
-                      { key: "end_date", label: "End" },
+                      { key: "start_date", label: "Start Date" },
+                      { key: "end_date", label: "End Date" },
                       { key: "status", label: "Status" },
                       { key: "max_usage", label: "Usage Limit" },
                       { key: "actions", label: "Actions" },
@@ -270,7 +279,7 @@ export default function CouponsDashboard() {
                       <th
                         key={col.key}
                         onClick={() => {
-                          if (col.key === "actions") return; // skip sort for actions
+                          if (col.key === "actions") return;
                           if (sortColumn === col.key) {
                             setSortOrder((prev) =>
                               prev === "asc" ? "desc" : "asc"
@@ -295,13 +304,19 @@ export default function CouponsDashboard() {
                   </tr>
                 </thead>
                 <tbody className="table-border-bottom-0">
-                  {sortedCoupons.map((c, idx) => {
+                  {sortedCoupons.map((c, index) => {
                     const currentDate = new Date();
                     const endDate = new Date(c.end_date);
                     const isExpired = endDate < currentDate;
 
                     return (
-                      <tr key={idx}>
+                      <tr
+                        key={c.id}
+                        style={{
+                          backgroundColor:
+                            index % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                        }}
+                      >
                         <td>{c.discount_coupon_code}</td>
                         <td>
                           {c.discount_coupon_type === "FLAT"
@@ -312,8 +327,8 @@ export default function CouponsDashboard() {
                         <td>{new Date(c.end_date).toLocaleDateString()}</td>
                         <td>
                           <span
-                            className={`badge bg-label-${
-                              isExpired ? "danger" : "success"
+                            className={`badge rounded-pill ${
+                              isExpired ? "bg-label-danger" : "bg-label-success"
                             }`}
                           >
                             {isExpired ? "Expired" : "Active"}

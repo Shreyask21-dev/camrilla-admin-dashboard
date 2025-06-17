@@ -5,6 +5,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import countries from "i18n-iso-countries";
+import enLocale from "i18n-iso-countries/langs/en.json";
+countries.registerLocale(enLocale);
+
+// const getCountryName = (code) => countries.getName(code, "en") || "Unknown";
+
 
 export default function Page() {
   const [users, setUsers] = useState([]);
@@ -18,6 +24,61 @@ export default function Page() {
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const usersPerPage = 10;
   const [searchTerm, setSearchTerm] = useState("");
+//   const countryNames = {
+//   IN: "India",
+//   US: "United States",
+//   LK: "Sri Lanka",
+//   GB: "United Kingdom",
+//   EU: "European Union",
+//   AU: "Australia",
+//   CA: "Canada",
+//   AE: "United Arab Emirates",
+//   SG: "Singapore",
+//   NZ: "New Zealand",
+//   MY: "Malaysia",
+//   MA: "Morocco",
+//   ZA: "South Africa",
+//   BD: "Bangladesh",
+//   NP: "Nepal",
+//   PK: "Pakistan",
+//   KW: "Kuwait",
+//   SA: "Saudi Arabia",
+//   QA: "Qatar",
+//   BH: "Bahrain",
+//   OM: "Oman",
+//   TH: "Thailand",
+//   PH: "Philippines",
+//   NG: "Nigeria",
+//   KE: "Kenya",
+//   GH: "Ghana",
+//   UG: "Uganda",
+//   ZW: "Zimbabwe",
+//   JP: "Japan",
+//   CN: "China",
+//   HK: "Hong Kong",
+//   KR: "South Korea",
+//   RU: "Russia",
+//   BR: "Brazil",
+//   MX: "Mexico",
+//   AR: "Argentina",
+//   TR: "Turkey",
+//   EG: "Egypt",
+//   IL: "Israel",
+//   CH: "Switzerland",
+//   SE: "Sweden",
+//   NO: "Norway",
+//   DK: "Denmark",
+//   SY: "Syria",
+//   SS: "South Sudan",
+//   HT: "Haiti",
+//   UY:"Uruguay",
+//   NA :""
+// };
+const getCountryName = (code) => {
+  if (!code) return "Unknown";
+  const name = countries.getName(code.toUpperCase(), "en", { select: "official" });
+  return `${code} - ${name || "Unknown"}`;
+};
 
   useEffect(() => {
     fetchUsers();
@@ -29,7 +90,7 @@ export default function Page() {
       name: user.name,
       email: user.email,
       mobile: user.mobile,
-      country: user.country,
+     country: `${user.country} - ${countryNames[user.country] || ""}`,
       current_plan: user.current_plan,
       plan_status: user.plan_status,
       plan_start_date: formatDate(user.plan_start_date),
@@ -156,7 +217,7 @@ export default function Page() {
                   <div className="d-flex align-items-center mb-2">
                     <div className="avatar me-4">
                       <span className="avatar-initial rounded-3 bg-label-primary">
-                        <i className="ri-user-line ri-24px"></i>
+                     <i className="ri-group-line ri-24px"></i>  
                       </span>
                     </div>
                     <h4 className="mb-0">{stats.total_users}</h4>
@@ -175,7 +236,7 @@ export default function Page() {
                   <div className="d-flex align-items-center mb-2">
                     <div className="avatar me-4">
                       <span className="avatar-initial rounded-3 bg-label-warning">
-                        <i className="ri-alert-line ri-24px"></i>
+                        <i className="ri-briefcase-line ri-24px"></i>
                       </span>
                     </div>
                     <h4 className="mb-0">{stats.professional_users}</h4>
@@ -192,7 +253,7 @@ export default function Page() {
                   <div className="d-flex align-items-center mb-2">
                     <div className="avatar me-4">
                       <span className="avatar-initial rounded-3 bg-label-danger">
-                        <i className="ri-route-line ri-24px"></i>
+                        <i className="ri-flashlight-line ri-24px"></i>
                       </span>
                     </div>
                     <h4 className="mb-0">{stats.active_users}</h4>
@@ -209,7 +270,7 @@ export default function Page() {
                   <div className="d-flex align-items-center mb-2">
                     <div className="avatar me-4">
                       <span className="avatar-initial rounded-3 bg-label-info">
-                        <i className="ri-time-line ri-24px"></i>
+                        <i className="ri-user-line ri-24px"></i>
                       </span>
                     </div>
                     <h4 className="mb-0">{stats.basic_users}</h4>
@@ -296,7 +357,9 @@ export default function Page() {
                         <td>{user.name}</td>
                         <td>{user.email}</td>
                         <td>{user.mobile}</td>
-                        <td>{user.country}</td>
+                      <td>{getCountryName(user.country)}</td>
+
+
                         <td>{user.current_plan || "—"}</td>
                         <td>{user.plan_status || "INACTIVE"}</td>
                         <td>{formatDate(user.plan_start_date)}</td>
